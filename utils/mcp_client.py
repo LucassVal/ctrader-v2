@@ -220,7 +220,11 @@ def _initialize_mcp() -> None:
         result = _parse_sse_body(body)
         if "error" in result:
             err = result["error"]
-            raise MCPMethodError("initialize", err.get("code", -1), err.get("message", ""))
+            if isinstance(err, dict):
+                raise MCPMethodError("initialize", err.get("code", -1), err.get("message", ""))
+            else:
+                logger.error("MCP devolveu erro como string: %s", str(err)[:200])
+                raise MCPMethodError("initialize", -1, str(err))
 
         server_info = result.get("result", {})
         _mcp_session_id = sid
