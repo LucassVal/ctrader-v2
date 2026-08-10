@@ -1,0 +1,21 @@
+# Artefatos de runtime (gerados pelos gates e pipeline)
+logs/index_graph.json
+logs/system.jsonl
+status/
+data/
+*.db
+*.db-wal
+*.db-shm
+__pycache__/
+.pytest_cache/
+
+.ruff_cache/
+__pycache__/
+.env
+data/
+status/
+logs/
+trades.db
+__pycache__/
+.ruff_cache/
+*.pyc

@@ -1,0 +1,52 @@
+# ruff.toml — Configuracao do linter Python (G0)
+# Max potencial: regras alem do default para qualidade total.
+
+target-version = "py311"
+
+[lint]
+select = [
+    "E", "W",     # pycodestyle (erros/warnings base)
+    "F",           # pyflakes (undefined names, unused imports)
+    "I",           # isort (ordenacao de imports)
+    "N",           # pep8-naming (convencoes de nomes)
+    "UP",          # pyupgrade (sintaxe moderna Python)
+    "B",           # flake8-bugbear (bugs comuns)
+    "SIM",         # flake8-simplify (simplificacoes)
+    "C4",          # flake8-comprehensions
+    "RUF",         # Regras especificas do ruff
+]
+ignore = [
+    "E501",        # line-too-long (formata black cuida)
+    "B008",        # do-not-assign-lambda (padrao valido em alguns casos)
+    "SIM108",      # use-ternary-operator (nem sempre mais legivel)
+]
+
+# Arquivos a ignorar
+exclude = [
+    "ctrader-skills-official",
+    "__pycache__",
+    "99_archive",
+    ".venv",
+    "tests/",
+]
+
+[lint.per-file-ignores]
+"__init__.py" = ["F401"]  # re-export e valido
+"utils/_artifacts.py" = ["F821"]  # forward-ref pd.DataFrame
+"utils/orc_dashboard.py" = ["E402"]  # sys.path.insert antes de imports
+"utils/mcp_client.py" = ["E402"]  # sys.path.insert antes de imports
+"utils/slot_tracker.py" = ["E402"]  # sys.path.insert antes de imports
+"utils/orc_ranking.py" = ["E402"]  # sys.path.insert antes de imports
+"f0_collector/orc_coleta.py" = ["E402"]  # sys.path.insert + import json tardio
+"f0_collector/backfill_orc_coleta.py" = ["E402"]  # sys.path.insert antes de imports
+"f3_validacao/orc_validacao.py" = ["E402"]  # sys.path.insert antes de imports
+"f4_executor/orc_ordens.py" = ["E402"]  # sys.path.insert antes de imports
+"dashboard.py" = ["E402"]  # sys.path.insert antes de imports
+"gates/run_mockbuster.py" = ["E402"]  # sys.path.insert antes de imports
+"gates/run_conformance.py" = ["N806"]  # SECRET_PATTERNS e constante (uppercase OK)
+"f1_analyzer/micro_orc_analise.py" = ["N806"]  # P e variavel matematica (convencao pivots)
+"tests/test_f0_pivots.py" = ["N806"]  # P_expected e variavel de teste
+"_archive_*.py" = ["E402", "B007"]  # archive files
+
+[lint.isort]
+combine-as-imports = true

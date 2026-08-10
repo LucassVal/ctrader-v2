@@ -1,0 +1,32 @@
+"""
+PROPOSITO: Wrapper F5 — reexporta orc_mar + satelites (rules_orc_mar, db_orc_mar)
+SPEC: S7
+ROADMAP: D.4
+"""
+
+from f5_mar import (
+    calibrate_daily,
+    ensure_schema,
+    loadrules_orc_mar,
+    log_rotation,
+    log_trade,
+    main,
+    saverules_orc_mar,
+    sync_candles_from_mcp,
+    sync_trades_from_mcp,
+)
+
+__all__ = [
+    "calibrate_daily",
+    "ensure_schema",
+    "loadrules_orc_mar",
+    "log_rotation",
+    "log_trade",
+    "main",
+    "saverules_orc_mar",
+    "sync_candles_from_mcp",
+    "sync_trades_from_mcp",
+]
+
+if __name__ == "__main__":
+    main()

@@ -1,0 +1,169 @@
+{
+  "breakdown": {
+    "AUDUSD": {
+      "confidence": 0.5,
+      "final_adjusted": 24.1,
+      "final_raw": 44.1,
+      "final_score": 24.1,
+      "macro": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      },
+      "reducers_applied": [
+        "SYDNEY"
+      ],
+      "sentiment": 0.5,
+      "sinal": "BULLISH",
+      "spread": 0,
+      "tecnico": {
+        "raw": 44.1,
+        "weight": 0.34,
+        "weighted": 17.0
+      },
+      "threshold": 70,
+      "volatilidade": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      }
+    },
+    "EURUSD": {
+      "confidence": 0.5,
+      "final_adjusted": 45.9,
+      "final_raw": 65.9,
+      "final_score": 45.9,
+      "macro": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      },
+      "reducers_applied": [
+        "SYDNEY"
+      ],
+      "sentiment": 0.5,
+      "sinal": "BEARISH",
+      "spread": 0,
+      "tecnico": {
+        "raw": 65.9,
+        "weight": 0.34,
+        "weighted": 17.0
+      },
+      "threshold": 70,
+      "volatilidade": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      }
+    },
+    "GBPUSD": {
+      "confidence": 0.5,
+      "final_adjusted": 32.7,
+      "final_raw": 52.7,
+      "final_score": 32.7,
+      "macro": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      },
+      "reducers_applied": [
+        "SYDNEY"
+      ],
+      "sentiment": 0.5,
+      "sinal": "BEARISH",
+      "spread": 0,
+      "tecnico": {
+        "raw": 52.7,
+        "weight": 0.34,
+        "weighted": 17.0
+      },
+      "threshold": 70,
+      "volatilidade": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      }
+    },
+    "USDJPY": {
+      "confidence": 0.5,
+      "final_adjusted": 13.0,
+      "final_raw": 33.0,
+      "final_score": 13.0,
+      "macro": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      },
+      "reducers_applied": [
+        "SYDNEY"
+      ],
+      "sentiment": 0.5,
+      "sinal": "NEUTRAL",
+      "spread": 0,
+      "tecnico": {
+        "raw": 33.0,
+        "weight": 0.34,
+        "weighted": 17.0
+      },
+      "threshold": 70,
+      "volatilidade": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      }
+    },
+    "XAUUSD": {
+      "confidence": 0.5,
+      "final_adjusted": 12.3,
+      "final_raw": 32.3,
+      "final_score": 12.3,
+      "macro": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      },
+      "reducers_applied": [
+        "SYDNEY"
+      ],
+      "sentiment": 0.5,
+      "sinal": "NEUTRAL",
+      "spread": 0,
+      "tecnico": {
+        "raw": 32.3,
+        "weight": 0.34,
+        "weighted": 17.0
+      },
+      "threshold": 70,
+      "volatilidade": {
+        "raw": 50,
+        "weight": 0.33,
+        "weighted": 16.5
+      }
+    }
+  },
+  "context": {
+    "atr_14_m15": 0,
+    "atr_14_m5": 0,
+    "dom_imbalance": 0,
+    "dxy_trend": "FLAT",
+    "news_imminent": false,
+    "sentiment_ratio": 0.5,
+    "session": "SYDNEY",
+    "spread_pips": 0
+  },
+  "meta": {
+    "positions_open_symbol": 0,
+    "slot_max": 30,
+    "slot_used": 0,
+    "timeframe": "M15",
+    "timestamp_utc": "2026-08-04T23:54:17.945261+00:00",
+    "trace_id": "T20260804235417-FUSION"
+  },
+  "symbols": [
+    "XAUUSD",
+    "EURUSD",
+    "GBPUSD",
+    "USDJPY",
+    "AUDUSD"
+  ]
+}

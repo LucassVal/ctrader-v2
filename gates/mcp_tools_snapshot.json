@@ -1,0 +1,445 @@
+{
+ "generated_at": "2026-07-23T20:20:12Z",
+ "server": "https://mcp.ctrader.com/trading/mcp (ctrader-trading, MCP 2025-03-26)",
+ "refresh": "python gates/run_mcp_contract.py --refresh",
+ "tools": {
+  "get_balance": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+   },
+   "description": "Get account balance, equity, and free margin"
+  },
+  "get_symbols": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+   },
+   "description": "Get available trading symbols"
+  },
+  "get_assets": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+   },
+   "description": "Get available assets (currencies)"
+  },
+  "get_spot_prices": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "symbolId": {
+      "type": "array",
+      "items": {
+       "type": "integer",
+       "minimum": -9007199254740991,
+       "maximum": 9007199254740991
+      },
+      "description": "Array of symbol IDs"
+     }
+    },
+    "required": [
+     "symbolId"
+    ]
+   },
+   "description": "Get current bid/ask prices for symbols"
+  },
+  "get_trendbars": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "symbolId": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Symbol ID"
+     },
+     "period": {
+      "type": "string",
+      "enum": [
+       "M_1",
+       "M_5",
+       "M_15",
+       "M_30",
+       "H_1",
+       "H_4",
+       "D_1",
+       "W_1",
+       "MN_1"
+      ],
+      "description": "Trendbar period"
+     },
+     "fromTimestamp": {
+      "description": "Start time (epoch ms or ISO-8601). Requires toTimestamp; range must not exceed 720h (30 days). Do NOT use fromTimestamp+count \u2014 that combination is invalid.",
+      "type": "string"
+     },
+     "toTimestamp": {
+      "description": "End time (epoch ms or ISO-8601). Defaults to now when only 'count' is provided. Required when fromTimestamp is set.",
+      "type": "string"
+     },
+     "count": {
+      "description": "Max bars to return (default 100). Pairs with toTimestamp: 'last N bars ending at toTimestamp'.",
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+     }
+    },
+    "required": [
+     "symbolId",
+     "period"
+    ]
+   },
+   "description": "Get historical OHLCV candle data for a symbol. Valid combinations: (count) \u2192 last N bars ending now; (toTimestamp, count) \u2192 last N bars ending at toTimestamp; (fromTimestamp, toTimestamp) \u2192 all bars i"
+  },
+  "get_positions": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+   },
+   "description": "Get open positions and pending orders"
+  },
+  "get_position_details": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "positionId": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Position ID"
+     }
+    },
+    "required": [
+     "positionId"
+    ]
+   },
+   "description": "Get position details with related orders and deals"
+  },
+  "get_pending_orders": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+   },
+   "description": "Get pending orders"
+  },
+  "get_order_history": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "fromTimestamp": {
+      "type": "string",
+      "description": "Start time (epoch ms or ISO-8601). Range to-from must not exceed 720h (30 days)."
+     },
+     "toTimestamp": {
+      "type": "string",
+      "description": "End time (epoch ms or ISO-8601). Range to-from must not exceed 720h (30 days)."
+     }
+    },
+    "required": [
+     "fromTimestamp",
+     "toTimestamp"
+    ]
+   },
+   "description": "Get historical orders (filled, cancelled, expired) within a time range. Range capped at 720h (30 days) by upstream \u2014 split wider ranges across multiple calls."
+  },
+  "get_deals": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "fromTimestamp": {
+      "type": "string",
+      "description": "Start time (epoch ms or ISO-8601). Range to-from must not exceed 720h (30 days)."
+     },
+     "toTimestamp": {
+      "type": "string",
+      "description": "End time (epoch ms or ISO-8601). Range to-from must not exceed 720h (30 days)."
+     },
+     "maxRows": {
+      "description": "Max deals to return (default 50)",
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+     }
+    },
+    "required": [
+     "fromTimestamp",
+     "toTimestamp"
+    ]
+   },
+   "description": "Get deal (trade execution) history. Range capped at 720h (30 days) by upstream \u2014 split wider ranges across multiple calls."
+  },
+  "get_version": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {}
+   },
+   "description": "Get service version and build information"
+  },
+  "amend_position": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "positionId": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Position ID"
+     },
+     "stopLoss": {
+      "description": "New stop loss as DISPLAY price (not pipettes); omit to leave unchanged",
+      "type": "number"
+     },
+     "takeProfit": {
+      "description": "New take profit as DISPLAY price (not pipettes); omit to leave unchanged",
+      "type": "number"
+     },
+     "trailingStopLoss": {
+      "description": "Enable trailing stop loss",
+      "type": "boolean"
+     }
+    },
+    "required": [
+     "positionId"
+    ]
+   },
+   "description": "Amend position stop loss / take profit"
+  },
+  "close_position": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "positionId": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Position ID"
+     },
+     "volume": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Volume to close in 1/100 base-asset units (volume = lots \u00d7 lotSize \u00d7 100). lotSize is per-symbol: forex=100000, metals=100, indices/crypto=1 \u2014 DO NOT assume forex value for other classes. For full close, pass the position's current volume from get_position_details."
+     }
+    },
+    "required": [
+     "positionId",
+     "volume"
+    ]
+   },
+   "description": "Close position (full or partial)"
+  },
+  "create_order": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "symbolId": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Symbol ID"
+     },
+     "orderType": {
+      "type": "string",
+      "enum": [
+       "MARKET",
+       "LIMIT",
+       "STOP",
+       "MARKET_RANGE",
+       "STOP_LIMIT"
+      ],
+      "description": "Order type"
+     },
+     "tradeSide": {
+      "type": "string",
+      "enum": [
+       "BUY",
+       "SELL"
+      ],
+      "description": "Trade direction"
+     },
+     "volume": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Volume in 1/100 base-asset units (volume = lots \u00d7 lotSize \u00d7 100). lotSize is per-symbol and DIFFERS by class: forex=100000 (1 lot = 10_000_000), metals=100 (XAUUSD 1 lot = 10_000), indices/crypto=1 (1 lot = 100). DO NOT assume the forex value for other instrument classes \u2014 the most common sizing bug is reusing 10_000_000 for XAUUSD and getting a 1000\u00d7 oversize trade."
+     },
+     "limitPrice": {
+      "description": "Limit price as DISPLAY price (not pipettes); required for LIMIT, STOP_LIMIT",
+      "type": "number"
+     },
+     "stopPrice": {
+      "description": "Stop trigger as DISPLAY price (not pipettes); required for STOP, STOP_LIMIT",
+      "type": "number"
+     },
+     "stopLoss": {
+      "description": "Stop loss as absolute DISPLAY price (not pipettes). Supported for LIMIT, STOP, STOP_LIMIT. NOT supported for MARKET / MARKET_RANGE \u2014 use relativeStopLoss (points) instead.",
+      "type": "number"
+     },
+     "takeProfit": {
+      "description": "Take profit as absolute DISPLAY price (not pipettes). Supported for LIMIT, STOP, STOP_LIMIT. NOT supported for MARKET / MARKET_RANGE \u2014 use relativeTakeProfit (points) instead.",
+      "type": "number"
+     },
+     "relativeStopLoss": {
+      "description": "Stop loss as a positive integer distance in POINTS from the open/fill price. Use this for MARKET / MARKET_RANGE orders (absolute stopLoss is rejected there). Direction is implicit from tradeSide: BUY \u2192 SL = fill \u2212 relativeStopLoss; SELL \u2192 SL = fill + relativeStopLoss. Mutually exclusive with stopLoss.",
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+     },
+     "relativeTakeProfit": {
+      "description": "Take profit as a positive integer distance in POINTS from the open/fill price. Use this for MARKET / MARKET_RANGE orders (absolute takeProfit is rejected there). Direction is implicit from tradeSide: BUY \u2192 TP = fill + relativeTakeProfit; SELL \u2192 TP = fill \u2212 relativeTakeProfit. Mutually exclusive with takeProfit.",
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+     },
+     "comment": {
+      "description": "Free-text comment",
+      "type": "string",
+      "maxLength": 256
+     },
+     "label": {
+      "description": "Label for bot identification",
+      "type": "string",
+      "maxLength": 100
+     },
+     "timeInForce": {
+      "description": "Time in force",
+      "type": "string",
+      "enum": [
+       "GOOD_TILL_CANCEL",
+       "GOOD_TILL_DATE",
+       "IMMEDIATE_OR_CANCEL"
+      ]
+     },
+     "baseSlippagePrice": {
+      "description": "Base DISPLAY price for slippage calculation (not pipettes)",
+      "type": "number"
+     },
+     "slippageInPoints": {
+      "description": "Max slippage in points",
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+     },
+     "expirationTimestamp": {
+      "description": "Expiration as epoch ms (integer only; ISO-8601 not accepted here)",
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+     }
+    },
+    "required": [
+     "symbolId",
+     "orderType",
+     "tradeSide",
+     "volume"
+    ]
+   },
+   "description": "Place a new order (MARKET, LIMIT, STOP, MARKET_RANGE, STOP_LIMIT)"
+  },
+  "amend_order": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "orderId": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Order ID"
+     },
+     "volume": {
+      "description": "New volume in 1/100 base-asset units (volume = lots \u00d7 lotSize \u00d7 100). lotSize is per-symbol: forex=100000, metals=100, indices/crypto=1 \u2014 DO NOT assume forex value for other classes.",
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+     },
+     "limitPrice": {
+      "description": "New limit as DISPLAY price (not pipettes)",
+      "type": "number"
+     },
+     "stopPrice": {
+      "description": "New stop as DISPLAY price (not pipettes)",
+      "type": "number"
+     },
+     "stopLoss": {
+      "description": "New stop loss as absolute DISPLAY price (not pipettes). Mutually exclusive with relativeStopLoss.",
+      "type": "number"
+     },
+     "takeProfit": {
+      "description": "New take profit as absolute DISPLAY price (not pipettes). Mutually exclusive with relativeTakeProfit.",
+      "type": "number"
+     },
+     "relativeStopLoss": {
+      "description": "New stop loss as a positive integer distance in POINTS from the open price. Mutually exclusive with stopLoss.",
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+     },
+     "relativeTakeProfit": {
+      "description": "New take profit as a positive integer distance in POINTS from the open price. Mutually exclusive with takeProfit.",
+      "type": "integer",
+      "exclusiveMinimum": 0,
+      "maximum": 9007199254740991
+     },
+     "expirationTimestamp": {
+      "description": "New expiration as epoch ms (integer only; ISO-8601 not accepted here)",
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991
+     }
+    },
+    "required": [
+     "orderId"
+    ]
+   },
+   "description": "Amend a pending order (price, volume, SL/TP). Pending orders are always LIMIT/STOP/STOP_LIMIT, so both absolute and relative SL/TP are supported \u2014 pick one form per side."
+  },
+  "cancel_order": {
+   "inputSchema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "properties": {
+     "orderId": {
+      "type": "integer",
+      "minimum": -9007199254740991,
+      "maximum": 9007199254740991,
+      "description": "Order ID"
+     }
+    },
+    "required": [
+     "orderId"
+    ]
+   },
+   "description": "Cancel a pending order"
+  }
+ },
+ "quirks": {
+  "_nota": "Verdades MEDIDAS no servidor onde o inputSchema publicado diverge do comportamento real (2026-07-23). O gate valida schema + quirks.",
+  "get_trendbars": {
+   "required_extra": [
+    "fromTimestamp",
+    "toTimestamp"
+   ],
+   "motivo": "HTTP 400 fromTimestamp: must not be null apesar de required listar so symbolId+period",
+   "timestamp_type": "string (ISO-8601 ou epoch-ms como string) \u2014 int da -32602",
+   "janela_max_horas": 720,
+   "count_max": 1000,
+   "count_default_trunca": 100,
+   "from_to_count_juntos": "VALIDO (descricao do schema diz invalido, mas funciona)"
+  }
+ }
+}

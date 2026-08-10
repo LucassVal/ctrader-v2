@@ -1,0 +1,28 @@
+"""
+PROPOSITO: Wrapper F1 — reexporta orc_analise + satelites (pillars_orc_analise, micro_orc_analise, sentiment_orc_analise, _news)
+SPEC: S3
+ROADMAP: D.4
+"""
+
+from f1_analyzer import (
+    analyze,
+    analyze_and_save,
+    calculate_macro_score,
+    calculate_tec_score,
+    calculate_vol_score,
+    check_news_imminent,
+    main,
+)
+
+__all__ = [
+    "analyze",
+    "analyze_and_save",
+    "calculate_macro_score",
+    "calculate_tec_score",
+    "calculate_vol_score",
+    "check_news_imminent",
+    "main",
+]
+
+if __name__ == "__main__":
+    main()

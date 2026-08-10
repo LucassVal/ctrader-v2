@@ -1,0 +1,70 @@
+{
+  "_description": "Calendario economico offline — eventos de alto impacto. Atualizar anualmente. Fonte: blueprint secao 9.5.",
+  "_rule": "Se evento nos proximos 15 min → news_imminent=true. Lote maximo reduzido para 0.02.",
+  "events": [
+    {
+      "name": "Non-Farm Payrolls (NFP)",
+      "schedule": "first_friday",
+      "months": [1,2,3,4,5,6,7,8,9,10,11,12],
+      "time_utc": "13:30",
+      "duration_minutes": 15,
+      "impact": "HIGH"
+    },
+    {
+      "name": "FOMC Rate Decision",
+      "schedule": "six_week_cycle",
+      "months": [1,3,5,6,7,9,11,12],
+      "time_utc": "19:00",
+      "duration_minutes": 30,
+      "impact": "HIGH"
+    },
+    {
+      "name": "FOMC Press Conference",
+      "schedule": "six_week_cycle",
+      "months": [1,3,5,6,7,9,11,12],
+      "time_utc": "19:30",
+      "duration_minutes": 45,
+      "impact": "HIGH"
+    },
+    {
+      "name": "CPI (Consumer Price Index)",
+      "schedule": "monthly_mid",
+      "months": [1,2,3,4,5,6,7,8,9,10,11,12],
+      "time_utc": "13:30",
+      "duration_minutes": 15,
+      "impact": "HIGH"
+    },
+    {
+      "name": "ISM Manufacturing PMI",
+      "schedule": "first_business_day",
+      "months": [1,2,3,4,5,6,7,8,9,10,11,12],
+      "time_utc": "15:00",
+      "duration_minutes": 15,
+      "impact": "HIGH"
+    },
+    {
+      "name": "ECB Rate Decision",
+      "schedule": "six_week_cycle",
+      "months": [1,3,4,6,7,9,10,12],
+      "time_utc": "13:15",
+      "duration_minutes": 15,
+      "impact": "HIGH"
+    },
+    {
+      "name": "BOE Rate Decision",
+      "schedule": "six_week_cycle",
+      "months": [2,3,5,6,8,9,11,12],
+      "time_utc": "12:00",
+      "duration_minutes": 15,
+      "impact": "HIGH"
+    },
+    {
+      "name": "FOMC Minutes",
+      "schedule": "three_weeks_after_fomc",
+      "months": [1,2,4,5,6,7,8,10,11,12],
+      "time_utc": "19:00",
+      "duration_minutes": 15,
+      "impact": "MEDIUM"
+    }
+  ]
+}

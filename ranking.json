@@ -1,0 +1,53 @@
+{
+  "status": "ok",
+  "candidates": 5,
+  "ranked": [
+    {
+      "symbol": "EURUSD",
+      "score": 45.9,
+      "confidence": 0.5,
+      "action": "REJECT",
+      "reason": "Mecanico (score=45.9, cf=0.5). ",
+      "penalty": 0,
+      "bonus": 0
+    },
+    {
+      "symbol": "GBPUSD",
+      "score": 27.700000000000003,
+      "confidence": 0.5,
+      "action": "REJECT",
+      "reason": "Mecanico (score=27.700000000000003, cf=0.5). Sobre-exposicao com EURUSD (corr=0.92); Confluencia com EURUSD (USD fraco)",
+      "penalty": 10,
+      "bonus": 5
+    },
+    {
+      "symbol": "AUDUSD",
+      "score": 24.1,
+      "confidence": 0.5,
+      "action": "REJECT",
+      "reason": "Mecanico (score=24.1, cf=0.5). ",
+      "penalty": 0,
+      "bonus": 0
+    },
+    {
+      "symbol": "USDJPY",
+      "score": 13.0,
+      "confidence": 0.5,
+      "action": "REJECT",
+      "reason": "Mecanico (score=13.0, cf=0.5). ",
+      "penalty": 0,
+      "bonus": 0
+    },
+    {
+      "symbol": "XAUUSD",
+      "score": 2.3000000000000007,
+      "confidence": 0.5,
+      "action": "REJECT",
+      "reason": "Mecanico (score=2.3000000000000007, cf=0.5). Sobre-exposicao com AUDUSD (corr=0.88)",
+      "penalty": 10,
+      "bonus": 0
+    }
+  ],
+  "source": "mechanical (IA removida S26)",
+  "timestamp_utc": 1786201764.6949196
+}

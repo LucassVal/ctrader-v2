@@ -1,0 +1,76 @@
+# ctrader_v2/config.yaml
+# Fonte: cTrader Web MCP oficial — https://mcp.ctrader.com/trading/mcp
+# Versao: 2.0.0 — endpoint remoto (não local)
+
+mcp:
+  url: "https://mcp.ctrader.com/trading/mcp"
+  auth_header: "Authorization"
+  auth_token: "Bearer eyJwbGFudCI6ImRlcml2IiwiZW52aXJvbm1lbnQiOiJkZW1vIiwidG9rZW4iOiJ6Uy9aR0FDSXFrRHJWVTNMSHU1cThlMTRVeE8rZlFvOVYrWnNUamp2a0djPSJ9"
+  timeout_seconds: 30.0  # handshake cold 20-40s (ROADMAP 5.4)
+  retry_max: 3
+  retry_backoff: 1.0
+  # Ambiente demo — sem risco financeiro
+
+symbols:
+  primary: "XAUUSD"
+  forex:
+    - "EURUSD"
+    - "GBPUSD"
+    - "USDJPY"
+    - "AUDUSD"
+  dxy_proxy: "EURUSD"
+
+timeframes:
+  - "M_5"
+  - "M_15"
+
+initial_weights:
+  macro: 0.33
+  volatilidade: 0.33
+  tecnico: 0.34
+
+thresholds:
+  entry_score: 70
+  fallback_score: 85
+  spread_max_pips: 2.0
+  atr_spike_multiplier: 2.0
+  # DOM removido — MCP v0.4.0 nao expoe
+
+risk:
+  lot_size: 0.1
+  rr_ratio: 2.0
+  max_positions_per_symbol: 3
+  slots_per_tf: 30
+  daily_drawdown_kill: 0.03
+  weekly_drawdown_kill: 0.05
+  margin_soft_limit: 0.20
+  ghost_timeout_s: 5
+
+monitor:
+  degrau_0_pct: 0.05
+  degrau_40_pct: 0.40
+  degrau_60_pct: 0.60
+  degrau_80_pct: 0.80
+  atr_spike_multiplier: 2.0
+  atr_window: 20
+  timeout_max:
+    m5: 5
+    m15: 15
+
+polling:
+  tick_interval_s: 3
+  candle_interval_s: 60
+  reconnect_max_retries: 3
+
+  timeout_seconds: 3.0
+  prompt_file: "prompts/validator_system.txt"
+  # Custo: ~$0.00002/chamada cacheada. 90 trades/dia ≈ $0.05/mes.
+
+mar:
+  weight_update_rate: 0.7
+  min_trades_for_calibration: 5
+  calibration_time_utc: "00:00"
+
+dashboard:
+  port: 8501
+  refresh_s: 5
