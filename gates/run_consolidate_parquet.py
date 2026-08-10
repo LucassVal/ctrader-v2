@@ -401,7 +401,7 @@ def consolidate(check_only: bool = False, fast: bool = False,
     now_ms = int(datetime.now(UTC).timestamp() * 1000)
     window_start_ms = now_ms - BACKFILL_WINDOW_DAYS * 86_400_000
 
-    prev_report = _load_previous_report() if (check_only or fast) and not auto_backfill else None
+    prev_report = _load_previous_report()  # sempre carrega — auto_backfill usa pra detectar estabilidade
     symbols_total = len(SYMBOLS)
     consolidated_mtimes: dict[str, float] = {}
 
@@ -566,7 +566,18 @@ def main() -> int:
 
     if total_gaps > 0:
         if auto_backfill:
-            print(f"[GAPS] {total_gaps} lacunas reais — preenchendo...")
+            # Verifica se gaps estao estaveis vs report anterior
+            prev_total = sum(
+                s.get("total_gaps", 0)
+                for s in (prev_report.get("symbols", {}) or {}).values()
+            ) if prev_report else -1
+            if prev_total == total_gaps:
+                print(f"[GAPS] {total_gaps} lacunas — ESTAVEIS (ja preenchidos, sem progresso)")
+                print(f"       Cache mantido. Backfill manual se necessario:")
+                print(f"       python f0_collector/backfill_orc_coleta.py --gaps")
+                print(f"       Report: status/gap_report.json")
+                return 0
+            print(f"[GAPS] {total_gaps} lacunas reais (eram {prev_total}) — preenchendo...")
             import subprocess
             backfill_script = str(ROOT / "f0_collector" / "backfill_orc_coleta.py")
             try:
