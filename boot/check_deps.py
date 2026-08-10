@@ -1,6 +1,7 @@
 """
 PROPOSITO: Verificador de dependencias do Neocortex V44 + cTrader V2.
 SPEC: S0 (pre-flight), S40 (TA-Lib)
+ROADMAP: FASE 6 (pre-flight validation)
 USO: python check_deps.py
 SAIDA: JSON puro (stdout) — sem stdout extra, sem logs.
 @NC-TELEM: check_deps

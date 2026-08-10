@@ -11,11 +11,3 @@ __pycache__/
 
 .ruff_cache/
 __pycache__/
-.env
-data/
-status/
-logs/
-trades.db
-__pycache__/
-.ruff_cache/
-*.pyc
