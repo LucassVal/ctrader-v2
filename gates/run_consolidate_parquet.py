@@ -598,17 +598,13 @@ def main() -> int:
                         report_path.unlink(missing_ok=True)
                     print(f"[OK] G23 + backfill concluido ({elapsed_total:.1f}s + backfill)")
                 else:
-                    report_path.unlink(missing_ok=True)
                     print(f"\n[WARN] G23 ok mas backfill falhou (exit={result.returncode})")
-                    print("       Cache invalidado — proximo boot fara fresh scan")
+                    print("       Cache mantido — gaps restantes salvos incrementalmente")
             except subprocess.TimeoutExpired:
-                # Timeout -> sempre invalida cache (removido — backfill gerencia)
-                report_path.unlink(missing_ok=True)
-                print(f"\n[WARN] G23 timeout ({1800}s) — cache invalidado")
-                print("       Proximo boot fara fresh scan com gaps reais")
+                print(f"\n[WARN] G23 timeout ({1800}s) — cache mantido")
+                print("       Gaps restantes salvos incrementalmente pelo backfill")
             except Exception as e:
-                report_path.unlink(missing_ok=True)
-                print(f"\n[ERR] G23 falhou: {e} — cache invalidado")
+                print(f"\n[ERR] G23 falhou: {e} — cache mantido com progresso parcial")
         else:
             print(f"[WARN] G23: {total_gaps} lacunas — preencher com: "
                   f"python f0_collector/backfill_orc_coleta.py --gaps")
