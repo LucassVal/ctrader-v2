@@ -112,17 +112,19 @@ $CTRADER = "$NC_ROOT\11.0_apps\ctrader"
 $DASH    = "$NC_ROOT\10.0_ui_dash"
 $REACT   = "$DASH\react-dashboard"
 
-# Carrega .env se existir (CTRADER_TOKEN, etc.)
-$envFile = "$CTRADER\.env"
-if (Test-Path $envFile) {
-    Get-Content $envFile | ForEach-Object {
-        if ($_ -match '^\s*([^#=]+)=(.*)$') {
-            $key = $matches[1].Trim()
-            $val = $matches[2].Trim().Trim('"').Trim("'")
-            [System.Environment]::SetEnvironmentVariable($key, $val, 'Process')
+# Carrega .env files (ctrader + parent neocortex)
+$envFiles = @("$CTRADER\.env", "$NC_ROOT\.env")
+foreach ($envFile in $envFiles) {
+    if (Test-Path $envFile) {
+        Get-Content $envFile | ForEach-Object {
+            if ($_ -match '^\s*([^#=]+)=(.*)$') {
+                $key = $matches[1].Trim()
+                $val = $matches[2].Trim().Trim('"').Trim("'")
+                [System.Environment]::SetEnvironmentVariable($key, $val, 'Process')
+            }
         }
+        Write-Host "  [OK] .env carregado: $envFile"
     }
-    Write-Host "  [OK] .env carregado"
 }
 # Python
 try { $v = & $VENV_PY --version 2>&1; Write-Host "  [OK] Python: $v"; "  [OK] Python: $v" | Out-File $BOOT_LOG -Append } catch { Write-Host "  [ERRO] Python"; "  [ERRO] Python" | Out-File $BOOT_LOG -Append }
