@@ -5,7 +5,7 @@
 mcp:
   url: "https://mcp.ctrader.com/trading/mcp"
   auth_header: "Authorization"
-  auth_token: "Bearer eyJwbGFudCI6ImRlcml2IiwiZW52aXJvbm1lbnQiOiJkZW1vIiwidG9rZW4iOiJ6Uy9aR0FDSXFrRHJWVTNMSHU1cThlMTRVeE8rZlFvOVYrWnNUamp2a0djPSJ9"
+  auth_token: "${CTRADER_TOKEN}"
   timeout_seconds: 30.0  # handshake cold 20-40s (ROADMAP 5.4)
   retry_max: 3
   retry_backoff: 1.0
