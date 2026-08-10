@@ -138,6 +138,9 @@ def init_client(config_path: str = "config.yaml", force: bool = False) -> None:
     mcp_cfg = config["mcp"]
     _mcp_url = mcp_cfg["url"]
     token = _session_override_token or mcp_cfg["auth_token"]
+    # Expande ${VAR} env vars (ex: ${CTRADER_TOKEN})
+    import re as _re, os as _os
+    token = _re.sub(r'\$\{(\w+)\}', lambda m: _os.environ.get(m.group(1), m.group(0)), token)
     _mcp_headers = {
         "Content-Type": "application/json",
         "Accept": "application/json, text/event-stream",
