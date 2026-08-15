@@ -230,6 +230,25 @@ def run_bloco2(
 | `OHLCSTX` | vectorbt.signals | OCO adaptativo |
 | `ReturnsAccessor` | vectorbt.returns | Sortino, VaR, Omega |
 
+## VALIDACAO EMPIRICA — CORRELACAO DXY/VIX + CAMADAS OCO (Fluxo 2)
+
+> **Data:** 2026-08-15 | **Harness:** `tests/test_bloco2_oco_layers.py` + `tests/test_bloco2_backtest_full.py` | **Janela:** ~9.8 meses XAUUSD M1
+
+### Correlacao XAUUSD (M1, ~9.8 meses)
+
+| Par | Correlacao |
+|-----|-----------|
+| XAUUSD x DXYUSD | -0.1245 (fraca negativa) |
+| XAUUSD x VIXUSD | +0.4473 (moderada positiva) |
+
+Amplitude media M1 (1440b) = 0.0236%.
+
+**Leitura:** XAUUSD confirma comportamento refugio — sobe com VIX (panico) e contra dolar fraco. O Panic Override (S41 §Camada 1b) tem base empirica: a correlacao VIX positiva (+0.45) suporta BUY autorizado em spike. A correlacao DXY (-0.12) e fraca o suficiente para NAO justificar filtro rigido — valida o filtro "soft/neutro" (ROC < 0.1% = neutro) do S41 §Sub-fase 4.
+
+### Camadas OCO (7 camadas)
+
+`tests/test_bloco2_backtest_full.py` valida o fluxo completo: Baseline S1/S2 -> D80 -> BE -> Trail -> OCO ATR -> OCO dinamico VIX, com Spread Gate (S42 §Camada 0) e OCO dinamico (S42 §Camada 4b: ATR mult 3.0 + lote 0.5 em spike VIX).
+
 ## CHANGELOG
 
 | Versão | Data | Mudança |

@@ -62,6 +62,7 @@ Sub-fases 1-6 implementadas: BUY/SELL RSI + DXY+VIX preflight + transparência +
 > **Métrica-alvo:** MAE BUY < 0.15% | MAE SELL < 0.15% | Sinais/dia: 3-15 | DXY filtered < 30%
 > **DDD:** Todos SATs vão em `utils/`. ORQ principal já existe: `utils/orc_bloco1.py`.
 > **Rollback Checkpoint:** /snapshot antes de cada sub-fase que modifica `orc_bloco1.py`.
+> **Validação empírica v2.1 (2026-08-15):** edge RSI/MACD/ADX é NULO (WR~50%, Sharpe~0 nos 5 ativos) — ver S41 §VALIDAÇÃO EMPÍRICA. Motiva a migração para v3.0 (microestrutura).
 
 ### FASE 3.1 — VWAP 1H + DXY ROC (Contexto Tático) ⬜
 

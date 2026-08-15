@@ -242,7 +242,7 @@ ctrader/
 |   ├── run_consolidate_parquet.py | G23 (merge + gap scan + gap report)
 |   ├── run_orchestrator_wire.py | G24 (ORQ/SAT/UTIL — 160 funcoes mapeadas)
 |   └── ...
-| ├── tests/                         TESTES unit + harness (129 tests, 48.9s)
+| ├── tests/                         TESTES unit + harness (276 tests: 274 pass, 2 skip, 188s)
 | │   ├── test_backtest_simulator.py    S30 backtest harness (6/6)
 | │   ├── test_f2_fusion.py             F2 fusao (2/2)
 | │   ├── test_orc_ranking.py           S35 ranking (3/3)
@@ -254,6 +254,9 @@ ctrader/
 | │   ├── test_vista_orc_mercado.py     S39 vista (3/3)
 | │   ├── test_f0_supervisor.py         Supervisor F0 (3/3)
 | │   ├── test_orc_calibracao.py        S36 calibracao (3/3)
+| │   ├── test_bloco1_ranking_metrics.py   S41 ranking empirico (4/4)
+| │   ├── test_bloco2_oco_layers.py        S42 camadas OCO + correlacao (2/2)
+| │   ├── test_bloco2_backtest_full.py     S42 backtest 7 camadas (4/4)
 ├── specs/                         DOCS (SSOT)
 │
 ├── data/ status/ logs/            RUNTIME

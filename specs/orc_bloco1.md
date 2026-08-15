@@ -428,3 +428,25 @@ dia anterior. Isso evita:
 - `scan_end()` → hoje 23:59 UTC
 - `backtest_start_2y()` → 2 anos atras de ontem 23:59
 - `backtest_start_9m()` → 9 meses atras de ontem 23:59
+
+---
+
+## VALIDACAO EMPIRICA — RANKING BUY/SELL (Fluxo 1, v2.1)
+
+> **Data:** 2026-08-15 | **Harness:** `tests/test_bloco1_ranking_metrics.py` | **Janela:** ~2 anos, 5 ativos forex, M5
+
+Resultado do Torneio do Passado (v2.1) sobre dados consolidados reais (XAUUSD/EURUSD/GBPUSD/USDJPY/AUDUSD):
+
+| Ativo | BUY MAE | SELL MAE | Sinais | Win Rate | Sharpe |
+|-------|---------|----------|--------|----------|--------|
+| XAUUSD | 0.12% | 0.12% | 3416 | 49.2% | -0.03 |
+| EURUSD | 0.04% | 0.04% | 3375 | 50.2% | +0.01 |
+| GBPUSD | 0.04% | 0.04% | 3185 | 46.3% | -0.08 |
+| USDJPY | 0.06% | 0.05% | 3704 | 49.0% | 0.00 |
+| AUDUSD | 0.05% | 0.05% | 3253 | 48.1% | -0.02 |
+
+**Best combo convergente em TODOS os ativos:**
+- BUY:  RSI(8) < 25 + ADX(14) > 20 + MACD(10) (parametro de ranking, nao filtro)
+- SELL: RSI(8) > 65 + ADX(14) > 20
+
+**Leitura:** WR ~50% e Sharpe ~0 em todos os ativos = o edge do v2.1 (RSI/MACD/ADX) e estatisticamente NULO. MAE absoluto baixo (0.04-0.12%) mas sem assimetria de retorno. Isto MOTIVA a FASE 3 (v3.0 microestrutura: VWAP 1H + Slope 5 velas + Panic Override) que substitui o gatilho RSI/MACD por um gerador de sinal com edge direcional real.

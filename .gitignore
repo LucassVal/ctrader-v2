@@ -1,6 +1,7 @@
 # Artefatos de runtime (gerados pelos gates e pipeline)
 logs/index_graph.json
 logs/system.jsonl
+logs/system.log
 status/
 data/
 *.db
@@ -8,6 +9,10 @@ data/
 *.db-shm
 __pycache__/
 .pytest_cache/
+ranking.json
+
+# Secrets — NUNCA versionar (R155)
+.env
 
 .ruff_cache/
 __pycache__/
