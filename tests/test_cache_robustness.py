@@ -39,8 +39,9 @@ def banner(text): print(f"\n{'-' * 55}\n  {text}\n{'-' * 55}")
 def download_10k() -> int:
     """Baixa 10K barras com fresh session."""
     import pandas as pd
-    from utils.mcp_client import get_trendbars, init_client
+
     import utils.mcp_client as mcp
+    from utils.mcp_client import get_trendbars, init_client
 
     mcp._mcp_initialized = False
     mcp._mcp_session_id = ""
@@ -88,7 +89,8 @@ def download_10k() -> int:
 
 def run_scan() -> int:
     for f in [STATUS_DIR / "gap_report.json"]:
-        if f.exists(): f.unlink()
+        if f.exists():
+            f.unlink()
     subprocess.run([VENV_PY, G23_SCRIPT, "--check", "--window-days", "730"],
                    capture_output=True, text=True, timeout=120, cwd=str(ROOT))
     rp = STATUS_DIR / "gap_report.json"
@@ -101,7 +103,8 @@ def run_scan() -> int:
 def delete_random_bars(pct: int) -> int:
     import pandas as pd
     path = CONSOLIDATED_DIR / f"{SYMBOL}_M1.parquet"
-    if not path.exists(): return 0
+    if not path.exists():
+        return 0
     df = pd.read_parquet(path)
     if "timestamp" not in df.columns and isinstance(df.index, pd.DatetimeIndex):
         df["timestamp"] = (df.index.astype("int64") // 1_000_000).astype("int64")
@@ -131,7 +134,8 @@ def main():
     banner("1. DOWNLOAD 10K barras")
     rows = download_10k()
     if rows == 0:
-        print("  [ERR] Download vazio"); return 1
+        print("  [ERR] Download vazio")
+        return 1
 
     banner("2. SCAN BASELINE")
     gaps_before = run_scan()

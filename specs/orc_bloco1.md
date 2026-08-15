@@ -382,6 +382,8 @@ MOMENTUM_GRID = {
 | `signal_matrix_orc_bloco1.py` | `utils/` | build_boolean_matrix() |
 | `time_exit_orc_bloco1.py` | `utils/` | generate_exits() |
 | `grid_search_orc_bloco1.py` | `utils/` | run_parameter_grid() |
+| `preflight_orc_bloco1.py` | `utils/` | preflight_check() — alinhamento DXY+VIX (split G12) |
+| `signal_detector_orc_bloco1.py` | `utils/` | detect_buy_signals(), detect_sell_signals() (split G12) |
 | `orc_pattern_candles.py` | `utils/` (S44) | detect_patterns() — v3.0 wire |
 
 ## CHANGELOG

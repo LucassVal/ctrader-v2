@@ -190,6 +190,24 @@ def test_calendar_filter_weekday_ok():
     print("  [PASS] C2: weekday gap nao filtrado")
 
 
+def test_calendar_filter_rollover():
+    """Gap 21:59->23:00 (rollover diario) DEVE ser filtrado.
+
+    BUG v2.1: DAILY_CLOSE_UTC = (21, 22) -> overlap 1.6% -> NAO filtrado.
+    FIX v2.2: DAILY_CLOSE_UTC = (21, 23) -> overlap 100% -> filtrado.
+    """
+    for sym in ["XAUUSD", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD"]:
+        a_ms = int(datetime(2026, 7, 28, 21, 59, tzinfo=UTC).timestamp() * 1000)
+        b_ms = int(datetime(2026, 7, 28, 23, 0, tzinfo=UTC).timestamp() * 1000)
+        closed = _precompute_closed_intervals(a_ms - 60_000, b_ms + 60_000, sym)
+        result = _is_weekend_or_daily_close(a_ms, b_ms, sym, closed)
+        assert result is True, (
+            f"REGRESSAO: {sym} gap 21:59-23:00 NAO filtrado — "
+            f"DAILY_CLOSE_UTC pode ter revertido para (21, 22)"
+        )
+    print("  [PASS] C3: rollover 21:59-23:00 filtrado para todos forex")
+
+
 # ============================================================
 # TESTE D: Merge gaps
 # ============================================================
@@ -295,6 +313,7 @@ def main():
     try:
         test_calendar_filter_weekend()
         test_calendar_filter_weekday_ok()
+        test_calendar_filter_rollover()
         results.append("C: PASS")
     except Exception as e:
         print(f"  [FAIL] {e}")

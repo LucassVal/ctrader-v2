@@ -18,8 +18,9 @@ import streamlit as st
 # --- PATH SETUP ---
 ROOT = Path(__file__).resolve().parent
 sys.path.insert(0, str(ROOT))
-from utils.health import check_decay, collect_metrics as collect_health
 from utils.metrics import collect_all as collect_metrics, validate_metrics
+
+from utils.health import check_decay, collect_metrics as collect_health
 
 DB_PATH = ROOT / "trades.db"
 RULES_PATH = ROOT / "custom_rules.json"

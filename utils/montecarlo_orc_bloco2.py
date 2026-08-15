@@ -44,13 +44,6 @@ def monte_carlo_shuffle(
             "n_simulations": int,              # Numero de simulacoes executadas
         }
 
-    Interpretacao:
-      - is_lucky = False (p >= 0.05): Sharpe NAO eh sorte — a sequencia importa.
-        A estrategia tem edge estatistico real.
-      - is_lucky = True (p < 0.05): Sharpe EH sorte — embaralhar produz resultado
-        igual ou melhor. A estrategia nao tem edge.
-      - max_dd_worst_shuffle: Se >25%, o risco de ruina em cenarios adversos
-        eh alto — reduzir tamanho de posicao.
     """
     if not trades:
         return {

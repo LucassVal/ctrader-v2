@@ -12,7 +12,7 @@ import pytest
 
 def test_build_parameter_grid_returns_list_of_dicts():
     """build_parameter_grid retorna list[dict] com keys de parametros."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("buy")
     assert isinstance(result, list)
@@ -22,7 +22,7 @@ def test_build_parameter_grid_returns_list_of_dicts():
 
 def test_build_parameter_grid_buy_has_correct_keys():
     """BUY_GRID contem rsi_period, rsi_threshold, macd_fast, adx_period, adx_threshold (v2.1)."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("buy")
     for combo in result:
@@ -35,7 +35,7 @@ def test_build_parameter_grid_buy_has_correct_keys():
 
 def test_build_parameter_grid_sell_has_correct_keys():
     """SELL_GRID contem rsi_period, rsi_threshold, adx_period, adx_threshold (v2.1 RSI overbought)."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("sell")
     for combo in result:
@@ -47,7 +47,7 @@ def test_build_parameter_grid_sell_has_correct_keys():
 
 def test_build_parameter_grid_force_has_correct_keys():
     """FORCE_GRID contem tick_vol_percentile, roc_period, roc_threshold."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("force")
     for combo in result:
@@ -58,7 +58,7 @@ def test_build_parameter_grid_force_has_correct_keys():
 
 def test_build_parameter_grid_buy_max_200():
     """BUY_GRID: 1080 combos reduzidos para no maximo 200 (Pareto 80/20)."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("buy")
     assert len(result) <= 200
@@ -68,7 +68,7 @@ def test_build_parameter_grid_buy_max_200():
 
 def test_build_parameter_grid_sell_exact_count():
     """SELL_GRID: 4x2x2x2x2 = 64 combos exatos."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("sell")
     assert len(result) == 36  # 3x3x2x2 = 36 (v2.1)
@@ -76,7 +76,7 @@ def test_build_parameter_grid_sell_exact_count():
 
 def test_build_parameter_grid_force_exact_count():
     """FORCE_GRID: 3x3x4 = 36 combos exatos."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("force")
     assert len(result) == 36
@@ -84,7 +84,7 @@ def test_build_parameter_grid_force_exact_count():
 
 def test_build_parameter_grid_cartesian_product():
     """Combos sao produto cartesiano (via itertools.product)."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("force")
     # Verificar que todos os combos sao unicos
@@ -94,7 +94,7 @@ def test_build_parameter_grid_cartesian_product():
 
 def test_build_parameter_grid_invalid_type_raises():
     """Tipo invalido lanca ValueError."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     with pytest.raises(ValueError, match="invalido"):
         build_parameter_grid("invalid")
@@ -102,7 +102,7 @@ def test_build_parameter_grid_invalid_type_raises():
 
 def test_build_parameter_grid_all_grids():
     """Testa 'all' combina todos os grids (buy + sell + force)."""
-    from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+    from utils.parameter_grid_orc_grid import build_parameter_grid
 
     result = build_parameter_grid("all")
     assert len(result) > 0

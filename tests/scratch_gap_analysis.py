@@ -1,7 +1,7 @@
 """Scratch: analisa padroes de gaps para diagnosticar o 'eterno 46 gaps'."""
 import json
-from datetime import datetime, UTC
 from collections import Counter
+from datetime import UTC, datetime
 from pathlib import Path
 
 REPORT = Path(r"c:\Workspace\Neocortex v44\neocortex\11.0_apps\ctrader\status\gap_report.json")
@@ -18,7 +18,7 @@ for sym, info in report["symbols"].items():
     gaps = info.get("gaps", [])
     total = info.get("total_gaps", len(gaps))
     cov = info.get("coverage_pct", 0)
-    
+
     # Analisa tamanhos dos gaps
     sizes = []
     for g in gaps:
@@ -27,12 +27,12 @@ for sym, info in report["symbols"].items():
         else:
             dur_ms = g["end_ms"] - g["start_ms"]
             sizes.append(dur_ms // 60000)
-    
+
     tiny = [s for s in sizes if s <= 15]
     small = [s for s in sizes if 15 < s <= 60]
     medium = [s for s in sizes if 60 < s <= 1440]
     large = [s for s in sizes if s > 1440]
-    
+
     print(f"\n{'='*50}")
     print(f"{sym}: {total} gaps (total_gaps field), {len(gaps)} in gaps list")
     print(f"  Coverage: {cov}% | Rows: {info.get('rows', 0)}")
@@ -40,7 +40,7 @@ for sym, info in report["symbols"].items():
     print(f"  Small (15-60m): {len(small)}")
     print(f"  Medium (1-24h): {len(medium)}")
     print(f"  Large (>24h): {len(large)}")
-    
+
     # Analisa horario dos gaps pequenos (provavel calendario)
     daily_pattern = Counter()
     weekday_pattern = Counter()
@@ -51,23 +51,23 @@ for sym, info in report["symbols"].items():
         if dur_min <= 15:
             daily_pattern[f"{dt_start.hour:02d}:{dt_start.minute:02d}"] += 1
             weekday_pattern[dt_start.weekday()] += 1
-    
+
     if daily_pattern:
-        print(f"  --- Padrao de gaps <=15min ---")
+        print("  --- Padrao de gaps <=15min ---")
         for time_str, count in daily_pattern.most_common(5):
             print(f"    {time_str} UTC: {count}x")
         print(f"  Weekdays: {dict(weekday_pattern)}")
-        print(f"  (0=Mon..6=Sun)")
-    
+        print("  (0=Mon..6=Sun)")
+
     # Verifica se gaps estao no FUTURO
     now_ms = int(datetime.now(UTC).timestamp() * 1000)
     future = [g for g in gaps if g["start_ms"] > now_ms]
     if future:
         print(f"  *** {len(future)} gaps in FUTURE dates! ***")
-    
+
     # Amostra de gaps recentes
     if gaps:
-        print(f"  --- Sample recent gaps ---")
+        print("  --- Sample recent gaps ---")
         for g in gaps[-3:]:
             dt_s = datetime.fromtimestamp(g["start_ms"] / 1000, tz=UTC)
             dt_e = datetime.fromtimestamp(g["end_ms"] / 1000, tz=UTC)
@@ -83,8 +83,8 @@ xau_gaps = xau.get("gaps", [])
 print(f"total_gaps field: {xau.get('total_gaps', 'N/A')}")
 print(f"gaps in list: {len(xau_gaps)}")
 print(f"DISCREPANCY: total_gaps ({xau.get('total_gaps', 0)}) != len(gaps) ({len(xau_gaps)})")
-print(f"  -> gap_report foi parcialmente atualizado pelo backfill?")
-print(f"  -> campo total_gaps nao foi recalculado apos update incremental?")
+print("  -> gap_report foi parcialmente atualizado pelo backfill?")
+print("  -> campo total_gaps nao foi recalculado apos update incremental?")
 print()
 
 # Simula merge de gaps com threshold 26h
@@ -98,7 +98,7 @@ for g in sorted_gaps:
     else:
         merged.append((gs, ge))
 
-print(f"Merge simulation (threshold=26h):")
+print("Merge simulation (threshold=26h):")
 print(f"  {len(xau_gaps)} gaps -> {len(merged)} ranges (backfill veria {len(merged)} ranges)")
 print()
 

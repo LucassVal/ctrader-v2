@@ -10,14 +10,17 @@ Orquestrador principal de walk-forward validation:
 """
 from __future__ import annotations
 
+import logging
 import os
 from typing import Any
 
 import pandas as pd
 
-from utils.parameter_grid_orc_bloco1 import build_parameter_grid
+from utils.parameter_grid_orc_grid import build_parameter_grid
 from utils.stability_analyzer_orc_grid import analyze_stability
 from utils.window_runner_orc_grid import run_single_window
+
+logger = logging.getLogger(__name__)
 
 # -- Constantes --
 CTRADER_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -60,6 +63,7 @@ def _load_parquet(symbol: str) -> pd.DataFrame | None:
 
             return df
 
+    logger.error("[ERRO] _load_parquet: nenhum parquet encontrado para %s", symbol)
     return None
 
 

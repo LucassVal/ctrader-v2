@@ -172,7 +172,7 @@ def check_dashboard_wire() -> tuple[int, int, list[str]]:
     # Format: sub-tab ID -> set of API endpoints consumed
     sub_tab_endpoints: dict[str, set[str]] = {
         "saude":         {"/health/fases"},  # S33 — sub-aba 1 de todas as abas mestras
-        "ov-health":     {"/health", "/health/fases", "/f0/status", "/f0/start", "/f0/stop", "/f0/restart",
+        "ov-health":     {"/status", "/health/fases", "/f0/status", "/f0/start", "/f0/stop", "/f0/restart",
                           "/backfill/status", "/backfill/start", "/backfill/stop"},  # S31-PROG revamp
         "ov-bank":       {"/banca"},
         # "overview":      {"/vector/overview", "/health", "/vector/strength", "/plugins"},
@@ -192,7 +192,7 @@ def check_dashboard_wire() -> tuple[int, int, list[str]]:
         "ranking":       {"/validate/ranking"},
         "live-logs":     {"/validate/live-logs"},
         "params":        set(),  # inline JSX, no API call
-        "health":        {"/health", "/f0/status", "/mcp/session", "/mcp/login", "/mcp/logout", "/f0/start", "/f0/stop", "/f0/restart"},
+        "health":        {"/status", "/f0/status", "/mcp/session", "/mcp/login", "/mcp/logout", "/f0/start", "/f0/stop", "/f0/restart"},
         "harness":       {"/harness"},
         "pipeline":      {"/metrics"},
         "banca":         {"/banca"},  # Mercados enriquecido (S25.9) vive aqui — removido da Pre-Analise

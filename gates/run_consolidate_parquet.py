@@ -32,27 +32,61 @@ SYMBOLS = ["XAUUSD", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD", "DXYUSD", "VIXUSD"]
 GAP_MIN_MINUTES = 5
 MIN_MS = 60_000
 BACKFILL_WINDOW_DAYS = 730  # janela alvo do Vector (S31): 2 anos
+# FIX v2.4: Indices DXY/VIX so possuem dados a partir de 2025-10-24 (~9.8 meses).
+# Configurar janela menor para nao gerar buraco historico gigante artificial.
+BACKFILL_WINDOW_DAYS_BY_SYMBOL: dict[str, int] = {
+    "DXYUSD": 295,
+    "VIXUSD": 295,
+}
+
 GARBAGE_FLOOR_MS = 915_148_800_000  # 1999-01-01 — ts abaixo disso e lixo (epoch 0)
-SCRIPT_VERSION = "2.1"  # invalida cache quando script muda
+SCRIPT_VERSION = "2.4"  # v2.4: janela backfill por ativo (indices=295 dias)
 
 # Fechamento semanal do mercado: sex 21:00 UTC -> dom 21:00 UTC
 WEEK_CLOSE_UTC = (4, 21)  # weekday 4 = sexta
 WEEK_OPEN_UTC = (6, 21)  # weekday 6 = domingo
 
 # Fechamento DIARIO por simbolo (UTC)
-# Pausas de rollover/fechamento diario por simbolo (UTC)
-# XAUUSD: 21:00-22:00 (fechamento diario)
-# EURUSD, GBPUSD, USDJPY, AUDUSD: 21:00-22:00 (rollover ~21:00-21:09 cobre ~220 gaps)
-# DXYUSD: 21:00-23:00 (pregao irregular, pausa longa)
-# VIXUSD: sem entrada — indice nao-continuo (cobertura <100% esperado)
+# Pausas de rollover/fechamento diario por simbolo.
+#
+# FIX v2.2: Forex majors: (21,22) expandido para (21,23) — rollover real ~21:59-23:00.
+# FIX v2.3: DXYUSD/VIXUSD: rollover vai de 20:55 a 00:59 (3h+). DST muda hora
+#   de inicio (pre-DST h=20, pos-DST h=21) mas o fim e sempre apos meia-noite.
+#   Solucao: (20,1) = 20h ate 01h do dia seguinte (5h de janela, cobre ambos DST).
+#   VIXUSD tambem adicionado: mesmo rollover + indice esparso (micro-gaps naturais).
+#
+# FORMATO: (h_close, h_reopen) em UTC. Se h_reopen < h_close, e dia seguinte.
 DAILY_CLOSE_UTC: dict[str, tuple[int, int]] = {
-    "XAUUSD": (21, 22),
-    "EURUSD": (21, 22),
-    "GBPUSD": (21, 22),
-    "USDJPY": (21, 22),
-    "AUDUSD": (21, 22),
-    "DXYUSD": (21, 23),
+    "XAUUSD": (21, 23),   # rollover real: ~21:59-23:00
+    "EURUSD": (21, 23),   # rollover: ~21:00-22:09 + fuzz ate 23:00
+    "GBPUSD": (21, 23),   # idem
+    "USDJPY": (21, 23),   # idem
+    "AUDUSD": (21, 23),   # idem
+    "DXYUSD": (20, 1),    # FIX v2.3: rollover 20:55->00:59 (DST-dual: h20 ou h21)
+    "VIXUSD": (20, 1),    # FIX v2.3: rollover idem DXY + indice esparso
 }
+
+# Threshold de gap por tipo de ativo
+# Indices (DXY, VIX) tem cotacao esparsa — gaps <30min sao normais.
+# Forex majors: M1 continuo, gap >=5min e lacuna real.
+GAP_MIN_MINUTES_INDEX: dict[str, int] = {
+    "DXYUSD": 30,   # indice: cotacao esparsa, gaps <30min sao fuzz
+    "VIXUSD": 30,   # indice: idem
+}
+
+# Feriados Forex — mercado fecha mais cedo ou nao abre.
+# Lista conservadora de datas FIXAS que se repetem anualmente.
+# Formato: (mes, dia, hora_close_utc, hora_reopen_utc_prox_dia)
+# Se hora_reopen > 24, significa que reabre no dia seguinte.
+# Referencia: CME/COMEX holiday schedule 2024-2026.
+FOREX_HOLIDAYS_FIXED: list[tuple[int, int, int, int]] = [
+    (12, 25, 0, 23),    # Natal: dia inteiro fechado
+    (1, 1, 0, 23),      # Ano Novo: dia inteiro fechado
+    (12, 24, 18, 23),   # Vespera Natal: fecha 18h UTC
+    (12, 31, 21, 23),   # Vespera Ano Novo: fecha 21h UTC (as vezes)
+    (7, 4, 18, 23),     # US Independence Day: fecha 18h UTC
+    (11, 28, 18, 23),   # Thanksgiving (dia fixo simplificado): fecha 18h UTC
+]
 
 
 # --- Cache de intervalos de fechamento (pre-computado uma vez) ---
@@ -83,8 +117,27 @@ def _precompute_closed_intervals(
         h1, h2 = DAILY_CLOSE_UTC[symbol]
         day = cursor.replace(hour=0, minute=0, second=0, microsecond=0)
         while day < end_dt:
-            intervals.append((day + timedelta(hours=h1), day + timedelta(hours=h2)))
+            close_start = day + timedelta(hours=h1)
+            if h2 > h1:
+                # Mesmo dia (ex: forex majors 21h->23h)
+                close_end = day + timedelta(hours=h2)
+            else:
+                # Dia seguinte (ex: indices 20h->01h+1)
+                close_end = day + timedelta(days=1, hours=h2)
+            intervals.append((close_start, close_end))
             day += timedelta(days=1)
+
+    # Feriados forex (fechamento antecipado ou dia inteiro)
+    for year in range(cursor.year, end_dt.year + 1):
+        for month, day_n, h_close, h_reopen in FOREX_HOLIDAYS_FIXED:
+            try:
+                holiday = datetime(year, month, day_n, h_close, 0, 0, tzinfo=UTC)
+                reopen = datetime(year, month, day_n, h_reopen, 0, 0, tzinfo=UTC)
+                if reopen <= holiday:
+                    reopen += timedelta(days=1)
+                intervals.append((holiday, reopen))
+            except ValueError:
+                pass  # dia invalido (ex: 30 fev)
 
     # Uniao de intervalos
     ivs = sorted(intervals)
@@ -398,8 +451,9 @@ def consolidate(check_only: bool = False, fast: bool = False,
     --check: apenas scan, sem merge (usa consolidado existente)
     --fast:  pula merge se consolidado nao mudou desde ultimo report
     """
-    now_ms = int(datetime.now(UTC).timestamp() * 1000)
-    window_start_ms = now_ms - BACKFILL_WINDOW_DAYS * 86_400_000
+    now = datetime.now(UTC)
+    yesterday_end = now.replace(hour=23, minute=59, second=59, microsecond=999000) - timedelta(days=1)
+    now_ms = int(yesterday_end.timestamp() * 1000)
 
     prev_report = _load_previous_report()  # sempre carrega — auto_backfill usa pra detectar estabilidade
     symbols_total = len(SYMBOLS)
@@ -414,13 +468,20 @@ def consolidate(check_only: bool = False, fast: bool = False,
     }
     symbols_report: dict[str, object] = {}
 
+    # Computa window_start_ms por simbolo
+    sym_window_starts: dict[str, int] = {}
+    for sym in SYMBOLS:
+        days = BACKFILL_WINDOW_DAYS_BY_SYMBOL.get(sym, BACKFILL_WINDOW_DAYS)
+        sym_window_starts[sym] = now_ms - days * 86_400_000
+
     # Pre-computa intervalos de fechamento (cache global por simbolo)
     closed_cache: dict[str, list[tuple[int, int]]] = {}
     for sym in SYMBOLS:
-        closed_cache[sym] = _precompute_closed_intervals(window_start_ms, now_ms, sym)
+        closed_cache[sym] = _precompute_closed_intervals(sym_window_starts[sym], now_ms, sym)
 
     for idx, sym in enumerate(SYMBOLS, 1):
         t0 = time.monotonic()
+        window_start_ms = sym_window_starts[sym]
         closed_intervals = closed_cache[sym]
         expected_open_min = _expected_open_minutes(
             window_start_ms, now_ms, sym, closed_intervals
@@ -493,8 +554,10 @@ def consolidate(check_only: bool = False, fast: bool = False,
             CONSOLIDATED_DIR / f"{sym}_M1.parquet"
         )
 
-        # Gap scan (usa intervalos pre-computados)
+        # Gap scan (usa intervalos pre-computados + threshold por tipo)
+        sym_gap_min = GAP_MIN_MINUTES_INDEX.get(sym, GAP_MIN_MINUTES)
         gaps = scan_gaps_anchored(ts, window_start_ms, now_ms,
+                                  gap_min_minutes=sym_gap_min,
                                   symbol=sym, closed_intervals=closed_intervals)
         first = datetime.fromtimestamp(ts[0] / 1000, tz=UTC).strftime("%Y-%m-%d") if ts else ""
         last = datetime.fromtimestamp(ts[-1] / 1000, tz=UTC).strftime("%Y-%m-%d") if ts else ""
@@ -567,17 +630,12 @@ def main() -> int:
     if total_gaps > 0:
         if auto_backfill:
             # Verifica se gaps estao estaveis vs report anterior
-            prev_total = sum(
-                s.get("total_gaps", 0)
-                for s in (prev_report.get("symbols", {}) or {}).values()
-            ) if prev_report else -1
-            if prev_total == total_gaps:
-                print(f"[GAPS] {total_gaps} lacunas — ESTAVEIS (ja preenchidos, sem progresso)")
-                print(f"       Cache mantido. Backfill manual se necessario:")
-                print(f"       python f0_collector/backfill_orc_coleta.py --gaps")
-                print(f"       Report: status/gap_report.json")
-                return 0
-            print(f"[GAPS] {total_gaps} lacunas reais (eram {prev_total}) — preenchendo...")
+            current_missing = sum(
+                s.get("total_missing_minutes", 0)
+                for s in symbols.values()
+            )
+            # Removida a trava de ESTAVEIS: o sistema sempre tentara preencher se houver lacunas.
+            print(f"[GAPS] {total_gaps} lacunas detectadas ({current_missing} min ausentes) — acionando backfill automaticamente...")
             import subprocess
             backfill_script = str(ROOT / "f0_collector" / "backfill_orc_coleta.py")
             try:
@@ -590,7 +648,7 @@ def main() -> int:
                     # C3: re-scan pos-backfill em vez de unlink cego
                     # Se gaps estaveis (irredutiveis) -> mantem cache para evitar loop
                     print("\n[OK] Backfill concluido — re-scan para verificar convergencia...")
-                    report2 = consolidate(check_only=False, fast=False, auto_backfill=False)
+                    report2 = consolidate(check_only=True, fast=False, auto_backfill=False)
                     new_total = sum(
                         s.get("total_gaps", s.get("gaps_count", len(s.get("gaps", []))))
                         for s in report2.get("symbols", {}).values()

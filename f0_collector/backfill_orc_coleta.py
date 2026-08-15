@@ -3,13 +3,13 @@ SPEC: S2.5
 ROADMAP: 1.3
 R-USE: storage_orc_coleta.save_backfill_parquet() + mcp_client.get_trendbars()
 
-v2.1 (2026-08-06): merge de gaps adjacentes (threshold 4h) — reduz chamadas MCP
+v2.1 (2026-08-06): merge de gaps adjacentes (threshold 4h) - reduz chamadas MCP
   Ex: 162 gaps XAUUSD -> ~30 ranges. Respeita throttle 5 req/s.
 
 Pipeline:
   1. Conecta MCP
   2. Para cada simbolo, pagina get_trendbars(sym, "M_1", from, to) PARA TRAS
-     (o servidor devolve as N barras mais recentes da janela — S1.1):
+     (o servidor devolve as N barras mais recentes da janela - S1.1):
      count=1000/pagina, span ~3000min (margem fds), cursor retrocede ate
      cobrir o range. Throttle 5 req/s.
   3. Acumula em DataFrame pandas
@@ -24,7 +24,7 @@ Resume: se o arquivo ja existe, pula periodos ja cobertos (timestamp incremental
 Modo --gaps (S31): le status/gap_report.json (gerado pelo G23) e busca
 APENAS as janelas lacunares, gravando direto no consolidado
 data/consolidated/{SYM}_M1.parquet. Converge: cada run preenche so o que falta.
-v2.1: funde gaps adjacentes (<4h) antes de paginar — reduz chamadas MCP em ~5x.
+v2.1: funde gaps adjacentes (<4h) antes de paginar - reduz chamadas MCP em ~5x.
 """
 from __future__ import annotations
 
@@ -74,7 +74,7 @@ def _write_progress(**kw: Any) -> None:
     """Publica progresso em status/backfill_progress.json (S31-PROG).
 
     Dashboard (/backfill/status), S33 (orc_health_fases) e orc_metricas leem
-    este arquivo — nenhum consumidor toca MCP nem o processo diretamente.
+    este arquivo - nenhum consumidor toca MCP nem o processo diretamente.
     """
     _PROGRESS.update(kw)
     _PROGRESS["updated_at"] = datetime.now(UTC).isoformat()
@@ -106,7 +106,7 @@ def _progress_start(mode: str) -> None:
 def _progress_tick(t0: float) -> None:
     """Recalcula totais/pct/ETA a cada pagina.
 
-    windows_total e ESTIMADO (paginas de 1000 barras) — done pode passar de
+    windows_total e ESTIMADO (paginas de 1000 barras) - done pode passar de
     total; pct e capado em 100 e eta nunca negativo.
     """
     syms = _PROGRESS.get("symbols", {})
@@ -138,7 +138,7 @@ def _build_windows(start: datetime, end: datetime) -> list[tuple[str, str]]:
 def _fetch_window(symbol: str, from_ts: str, to_ts: str) -> list[dict[str, Any]]:
     """Busca uma janela de trendbars M_1. Retorna lista de dicts.
 
-    mcp_client.get_trendbars() JA devolve a lista de barras (S1.1) —
+    mcp_client.get_trendbars() JA devolve a lista de barras (S1.1) -
     NAO e dict com chave "trendbars".
 
     v2.2: retry com backoff exponencial (3 tentativas, 2s->4s->8s).
@@ -183,7 +183,7 @@ def _iter_pages(symbol: str, g_start: datetime, g_end: datetime):
     o servidor devolve as N barras mais recentes da janela [from, to]).
 
     Cada pagina pede count=1000 com span ~3000min (1000 barras M_1 x3 de
-    margem p/ fds — mesmo heuristico do mcp_client). O cursor retrocede
+    margem p/ fds - mesmo heuristico do mcp_client). O cursor retrocede
     para (barra mais antiga recebida - 1min) ate cobrir g_start.
 
     Anti-loop: aborta o range se a pagina nao retroceder o cursor ou se
@@ -212,7 +212,7 @@ def _iter_pages(symbol: str, g_start: datetime, g_end: datetime):
         empty_streak = 0
         earliest = min(ts_ms)
         # Yield PRIMEIRO: a barra da borda (earliest == to) e dado legitimo.
-        # A guarda so impede LOOP — se a pagina nao retrocede o cursor,
+        # A guarda so impede LOOP - se a pagina nao retrocede o cursor,
         # entrega o que veio e encerra o range (ex.: janela de pausa diaria
         # em que so existe a barra da reabertura).
         yield bars
@@ -251,7 +251,8 @@ def _bars_to_rows(symbol: str, bars: list[dict[str, Any]]) -> list[dict[str, Any
 def backfill_symbol(symbol: str, t0: float | None = None) -> Path:
     """Backfill completo de um simbolo. Retorna path do Parquet salvo."""
     t0 = t0 or time.monotonic()
-    end = datetime.now(UTC)
+    now = datetime.now(UTC)
+    end = now.replace(hour=23, minute=59, second=59, microsecond=999000) - timedelta(days=1)
     start = end - timedelta(days=BACKFILL_YEARS * 365)
 
     # Resume: carrega existente se houver
@@ -306,7 +307,7 @@ def backfill_symbol(symbol: str, t0: float | None = None) -> Path:
 def _health_check_mcp(reinit: bool = True) -> bool:
     """Pinga o MCP com get_balance(). Se falhar, re-inicializa com force.
 
-    v2.4: reconexao PROATIVA — se sessao tem >7 min, refaz handshake antes de expirar.
+    v2.4: reconexao PROATIVA - se sessao tem >7 min, refaz handshake antes de expirar.
     Sessao cTrader MCP expira em ~8-10 min independente de atividade (server-side).
     """
     try:
@@ -314,7 +315,7 @@ def _health_check_mcp(reinit: bool = True) -> bool:
         return bool(bal)
     except Exception:
         if reinit:
-            logger.info("MCP inativo — re-inicializando sessao (force)...")
+            logger.info("MCP inativo - re-inicializando sessao (force)...")
             config = ROOT / "config.yaml"
             if config.exists():
                 try:
@@ -329,11 +330,11 @@ def _health_check_mcp(reinit: bool = True) -> bool:
                     logger.info("MCP re-conectado (force)")
                     return True
                 except Exception as e2:
-                    logger.info("Falha ao re-conectar MCP: %s", e2)
+                    logger.error("Falha ao re-conectar MCP: %s", e2)
         return False
 
 
-# Session freshness — delegado ao utils.mcp_client.ensure_session_fresh() (SSOT)
+# Session freshness - delegado ao utils.mcp_client.ensure_session_fresh() (SSOT)
 # SESSION_MAX_AGE=300s, get_session_age() para health check
 
 
@@ -359,7 +360,7 @@ def _update_gap_report_incremental(
 
     remaining = current_idx  # ranges ja processados
     if remaining >= total_ranges:
-        # Todos preenchidos — remove simbolo do report
+        # Todos preenchidos - remove simbolo do report
         report["symbols"].pop(symbol, None)
     else:
         # Atualiza ranges do simbolo: so os nao preenchidos
@@ -439,7 +440,7 @@ def fill_gaps() -> int:
 
             # Pre-conta paginas estimadas de todas as lacunas do simbolo
             # (1 pagina = ate 1000 barras M_1; missing_minutes ja desconta fds)
-            # v2.3: merge por threshold (26h) — NUNCA funde tudo em 1 range
+            # v2.3: merge por threshold (26h) - NUNCA funde tudo em 1 range
             # pois re-baixaria dados ja existentes. Gaps proximos (<26h) viram
             # ranges maiores; gaps distantes ficam separados.
             merge_threshold_h = 26  # cobre fds + feriados
@@ -475,7 +476,7 @@ def fill_gaps() -> int:
             ensure_session_fresh(str(ROOT / "config.yaml"))
             _hs_start = time.monotonic()
             if not _health_check_mcp():
-                logger.error("MCP health check falhou para %s — pulando", sym)
+                logger.error("MCP health check falhou para %s - pulando", sym)
                 sym_prog["state"] = "error"
                 continue
             _hs_time = time.monotonic() - _hs_start
@@ -483,7 +484,7 @@ def fill_gaps() -> int:
 
             # Health check antes de cada simbolo
             if not _health_check_mcp():
-                logger.error("MCP indisponivel — pulando %s", sym)
+                logger.error("MCP indisponivel - pulando %s", sym)
                 sym_prog["state"] = "error"
                 _write_progress(last_error=f"MCP offline em {sym}")
                 continue
@@ -501,6 +502,10 @@ def fill_gaps() -> int:
             if len(df) and "timestamp" in df.columns:
                 df = df[pd.to_numeric(df["timestamp"], errors="coerce").fillna(0) > 0]
                 df = df.reset_index(drop=True)
+
+            # v4.0: guarda contagem ANTES do backfill para detectar barras genuinamente novas
+            rows_before = len(df.drop_duplicates(subset=["timestamp"], keep="last")) if len(df) else 0
+
             total_new = 0
             _last_hc = time.monotonic()
             total_ranges = len(gap_ranges)
@@ -508,22 +513,26 @@ def fill_gaps() -> int:
             for rg_idx, (g_start, g_end) in enumerate(gap_ranges, 1):
                 # v2.6: renova sessao MCP a cada range
                 if not ensure_session_fresh(str(ROOT / "config.yaml")):
-                    logger.error("Sessao MCP nao renova — salvando parcial de %s", sym)
+                    logger.error("Sessao MCP nao renova - salvando parcial de %s", sym)
                     break
                 range_bars = 0
-                g_start_str = g_start.strftime("%Y-%m-%d")
-                g_end_str = g_end.strftime("%Y-%m-%d")
+                g_start_str = g_start.strftime("%Y-%m-%d %H:%M")
+                g_end_str = g_end.strftime("%Y-%m-%d %H:%M")
                 for bars in _iter_pages(sym, g_start, g_end):
-                    df = append_rows(df, _bars_to_rows(sym, bars))
-                    total_new += len(bars)
-                    range_bars += len(bars)
+                    g_start_ms = int(g_start.timestamp() * 1000)
+                    g_end_ms = int(g_end.timestamp() * 1000)
+                    valid_bars = [b for b in bars if b.get("timestamp") and g_start_ms <= int(b["timestamp"]) <= g_end_ms]
+                    if valid_bars:
+                        df = append_rows(df, _bars_to_rows(sym, valid_bars))
+                        total_new += len(valid_bars)
+                        range_bars += len(valid_bars)
                     sym_prog["windows_done"] += 1
                     sym_prog["bars"] = total_new
                     _progress_tick(t0)
                     # Health check a cada 60s durante downloads longos
                     if time.monotonic() - _last_hc > 60:
                         if not _health_check_mcp():
-                            logger.error("MCP caiu durante backfill de %s — salvando parcial", sym)
+                            logger.error("MCP caiu durante backfill de %s - salvando parcial", sym)
                             break
                         _last_hc = time.monotonic()
                 # Progresso por range
@@ -532,29 +541,32 @@ def fill_gaps() -> int:
                           f"+{range_bars} barras OK", flush=True)
 
                 # v3.0: salva parcial a cada 10 ranges (persistencia anti-Ctrl+C)
+                # v4.0: so salva se realmente adicionou linhas novas (evita mtime fantasma)
                 if rg_idx % 10 == 0 and total_new > 0:
                     df_save = df.sort_values("timestamp").drop_duplicates(subset=["timestamp"], keep="last")
-                    df_save.to_parquet(cons_path, index=False)
-                    # v3.1: atualiza gap_report incremental — so ranges NAO preenchidos
-                    _update_gap_report_incremental(report_path, sym, rg_idx, gap_ranges, total_ranges)
-                    print(f"  [SAVE] range {rg_idx}/{total_ranges} -> {len(df_save):,} linhas no disco", flush=True)
+                    if len(df_save) > rows_before:
+                        df_save.to_parquet(cons_path, index=False)
+                        _update_gap_report_incremental(report_path, sym, rg_idx, gap_ranges, total_ranges)
+                        print(f"  [SAVE] range {rg_idx}/{total_ranges} -> {len(df_save):,} linhas no disco", flush=True)
 
-            if total_new == 0:
-                # Nao e erro: lacunas em periodo SEM PREGAO (pausa diaria
-                # 21-22h UTC, feriados) — o servidor nao tem barras ali.
-                # Se o MCP estivesse fora, TODOS os simbolos zerariam
-                # (verificado no resumo final do run).
-                sym_prog["state"] = "done"
-                print(f"  [OK] {sym}: 0 barras novas — lacunas sem pregao (pausa/feriado)")
-                continue
-
+            # v4.0: dedup final e compara com contagem original
             df = df.sort_values("timestamp").drop_duplicates(subset=["timestamp"], keep="last")
             df = df.reset_index(drop=True)
+            rows_after = len(df)
+            genuinely_new = rows_after - rows_before
+
+            if genuinely_new <= 0:
+                # API retornou barras mas TODAS ja existiam (duplicatas).
+                # NAO salvar: preserva mtime do arquivo -> G23 cache --fast funciona.
+                sym_prog["state"] = "done"
+                print(f"  [OK] {sym}: 0 barras genuinamente novas (API retornou {total_new} duplicatas) - arquivo intacto")
+                continue
+
             df.to_parquet(cons_path, index=False)
             sym_prog["state"] = "done"
             _progress_tick(t0)
-            logger.info("%s: %d barras preenchidas em %d lacunas -> %s", sym, total_new, len(gaps), cons_path.name)
-            print(f"  [OK] {sym}: +{total_new} barras ({len(gaps)} lacunas)")
+            logger.info("%s: %d barras preenchidas em %d lacunas -> %s", sym, genuinely_new, len(gaps), cons_path.name)
+            print(f"  [OK] {sym}: +{genuinely_new} barras genuinas ({len(gaps)} lacunas)")
 
         _write_progress(state="done", current_symbol=None, symbols=_PROGRESS["symbols"])
         print()

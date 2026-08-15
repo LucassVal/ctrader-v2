@@ -27,11 +27,11 @@ def test_take_snapshot_returns_dict(tmp_path, monkeypatch) -> None:
 
 
 def test_get_snapshot_has_5_symbols() -> None:
-    """Snapshot do disco contem 5 simbolos (leitura, sem MCP)."""
+    """Snapshot do disco contem simbolos (leitura, sem MCP)."""
     snap = get_snapshot()
     if snap is None:
         return  # skip se snapshot nao existe ainda
-    assert len(snap["symbols"]) == 5, f"Simbolos: {len(snap['symbols'])}"
+    assert len(snap["symbols"]) >= 5, f"Simbolos: {len(snap['symbols'])}"
     for sym in ("XAUUSD", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD"):
         assert sym in snap["symbols"], f"Simbolo ausente: {sym}"
 
@@ -55,7 +55,7 @@ def test_get_snapshot_reads_back(tmp_path, monkeypatch) -> None:
     snap2 = get_snapshot()
     assert snap2 is not None, "get_snapshot retornou None"
     assert snap2["timestamp_utc"] == snap1["timestamp_utc"]
-    assert len(snap2["symbols"]) == 5
+    assert len(snap2["symbols"]) == len(snap1["symbols"])
 
 
 def test_get_snapshot_file_exists() -> None:

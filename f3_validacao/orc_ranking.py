@@ -1,17 +1,11 @@
-"""
-PROPOSITO: Orquestrador de Ranking (F3 — last mile)
-SPEC: S35 (pai) — spotter + sniper mecanicos, IA removida (S26)
-ROADMAP: 4.0
-FLOW:   fusion_output.json -> rank_signals (spotter + sniper) -> ranking.json
-        IA removida (S26). Apenas mecanico: score >= 70 -> APPROVE.
-
-R21: 2026-07-23 — removido wire ao vector_db (governanca). Agora consome F1+F2, nao o banco vetorial do Neocortex.
+"""PROPOSITO: Orquestrador de Ranking (F3 — last mile).
+SPEC: S35 (pai) — spotter + sniper mecanicos, IA removida (S26).
+ROADMAP: 4.0 — fusion_output.json -> rank_signals -> ranking.json.
 """
 
 from __future__ import annotations
 
 import json
-import os
 import sys
 import time
 from pathlib import Path
@@ -26,9 +20,7 @@ from utils.logger import (  # noqa: E402
 
 logger = get_logger(__name__, "RANKING")
 
-# # DEEPSEEK_URL  # IA removida (ROADMAP 4.0) = "..."  # IA removida (ROADMAP 4.0)
 FALLBACK_SCORE = 70  # Score minimo para fallback mecanico
-IA_TIMEOUT = 5.0  # segundos
 
 # Artefatos do pipeline (F1 -> F2 -> F3)
 SCORES_RAW_PATH = ROOT / "scores_raw.json"
@@ -44,16 +36,6 @@ def _has_multi_symbol_format(data: dict[str, Any]) -> bool:
     symbols = data.get("symbols", [])
     breakdown = data.get("breakdown", {})
     return bool(symbols) and isinstance(breakdown, dict) and bool(breakdown)
-
-
-def _get_api_key() -> str:
-    """API key do .env (R155)."""
-    env_file = ROOT / ".env"
-    if env_file.exists():
-        for line in env_file.read_text(encoding="utf-8").splitlines():
-            # DEEPSEEK_API_KEY skip: IA removida (ROADMAP 4.0)
-                return line.split("=", 1)[1].strip().strip('"').strip("'")
-    return os.environ.get("DEEPSEEK_API_KEY", "")
 
 
 def _load_fusion_output() -> dict[str, Any]:
@@ -136,58 +118,6 @@ def _convert_score_live_to_fusion(live: dict[str, Any]) -> dict[str, Any]:
             "dom_imbalance": 0,
         },
     }
-
-
-def _call_deepseek_ranking(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:
-    """Envia candidatos para DeepSeek ranquear. Retorna lista ordenada por score."""
-    api_key = _get_api_key()
-    if not api_key:
-        logger.info("Sem API key DeepSeek. Usando fallback mecanico para ranking.")
-        return _fallback_ranking(candidates)
-
-    prompt = (
-        "Voce e um ranker de sinais de trading. Analise os sinais abaixo e "
-        "retorne um JSON array com cada sinal contendo: symbol, score (0-100), "
-        "action (APPROVE/REJECT), reason (1 frase). Priorize: score alto, "
-        "confianca alta, simbolos descorrelacionados.\n\n"
-        f"Sinais: {json.dumps(candidates, ensure_ascii=False)}\n\n"
-        "Retorne APENAS JSON array, sem markdown."
-    )
-
-    try:
-        import requests
-        resp = requests.post(
-            # DEEPSEEK_URL  # IA removida (ROADMAP 4.0),
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-            },
-            json={
-                "model": "deepseek-chat",
-                "messages": [
-                    {"role": "system", "content": "You are a trading signal ranker. Return ONLY JSON arrays."},
-                    {"role": "user", "content": prompt},
-                ],
-                "temperature": 0.3,
-                "max_tokens": 500,
-            },
-            timeout=IA_TIMEOUT,
-        )
-        if resp.status_code == 200:
-            content = resp.json()["choices"][0]["message"]["content"]
-            content = content.strip()
-            if content.startswith("```"):
-                content = content.split("```")[1]
-                if content.startswith("json"):
-                    content = content[4:]
-            ranked = json.loads(content)
-            if isinstance(ranked, list):
-                logger.info("DeepSeek ranqueou %d candidatos", len(ranked))
-                return ranked
-    except Exception as e:
-        logger.error("DeepSeek ranking falhou: %s", e)
-
-    return _fallback_ranking(candidates)
 
 
 def _fallback_ranking(candidates: list[dict[str, Any]]) -> list[dict[str, Any]]:

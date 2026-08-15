@@ -48,6 +48,7 @@ def run_bloco2(
 
     from utils.breakeven_orc_bloco2 import build_be_callback
     from utils.layer_comparator_orc_bloco2 import compare_layers
+    from utils.montecarlo_orc_bloco2 import monte_carlo_shuffle
     from utils.oco_atr_orc_bloco2 import calc_sl_tp_pcts
     from utils.partial_exit_orc_bloco2 import build_tp_callback
 
@@ -186,11 +187,20 @@ def run_bloco2(
     if not comparison.empty:
         best_layer = str(comparison.iloc[0]["Camada"])
 
+    # Monte Carlo shuffle na melhor camada (S42 §Pre-requisito: Sharpe nao eh sorte)
+    best_trades = trades_per_layer.get(best_layer, [])
+    mc_trades = [
+        {"pnl_pct": float(t.get("Return", t.get("PnL", 0.0)) or 0.0)}
+        for t in best_trades
+    ]
+    monte_carlo = monte_carlo_shuffle(mc_trades, n_simulations=200, seed=42)
+
     return {
         "comparison": comparison,
         "best_layer": best_layer,
         "equity_curves": equity_curves,
         "trades_per_layer": trades_per_layer,
+        "monte_carlo": monte_carlo,
     }
 
 

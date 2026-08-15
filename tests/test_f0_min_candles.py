@@ -30,20 +30,21 @@ def test_poll_candles_count_default() -> None:
 
 
 def test_poll_cycle_schema() -> None:
-    """poll_cycle() retorna dict com 5 simbolos, cada um com OHLCV+spot."""
+    """poll_cycle() retorna dict com todos simbolos, cada um com OHLCV+spot."""
     schema_fields = {"symbol", "timestamp", "open", "high", "low", "close",
                      "tick_volume", "bid", "ask", "spread"}
     # poll_cycle retorna {symbol: {fields}} — testa estrutura
     result = poll_cycle()
     assert isinstance(result, dict), f"poll_cycle deve retornar dict, nao {type(result)}"
-    assert len(result) == 5, f"poll_cycle deve retornar 5 simbolos, nao {len(result)}"
+    assert len(result) >= 5, f"poll_cycle deve retornar ao menos 5 simbolos, nao {len(result)}"
     for sym, data in result.items():
         missing = schema_fields - set(data.keys())
         assert not missing, f"{sym}: campos ausentes {missing}"
 
 
 def test_poll_cycle_symbols() -> None:
-    """poll_cycle cobre os 5 ativos do universo."""
-    expected = {"XAUUSD", "EURUSD", "GBPUSD", "USDJPY", "AUDUSD"}
+    """poll_cycle cobre os ativos do universo."""
+    from f0_collector.poller_orc_coleta import ALL_COLLECT_SYMBOLS
+    expected = set(ALL_COLLECT_SYMBOLS)
     result = poll_cycle()
     assert set(result.keys()) == expected, f"Simbolos: {set(result.keys())} != {expected}"

@@ -1,14 +1,14 @@
-"""PROPOSITO: Filtro DXY + VIX — travas macro para sinais do Bloco 1.
+"""PROPOSITO: Filtro DXY + VIX - travas macro para sinais do Bloco 1.
 
-SPEC: S41.4 — Contrapeso Macro
+SPEC: S41.4 - Contrapeso Macro
 SAT: dxy_filter_orc_bloco1
 
-Regras (v2.0 — correlacao DURA por ROC):
+Regras (v2.0 - correlacao DURA por ROC):
 - XAUUSD/EURUSD/GBPUSD/AUDUSD: correlacao INVERSA com DXY
   (BUY so se DXY em QUEDA; SELL so se DXY em ALTA)
 - USDJPY: correlacao DIRETA com DXY
   (BUY exige DXY em ALTA; SELL exige DXY em QUEDA)
-- VIX: filtro de panico — VIX > threshold -> ABORTA todos os sinais
+- VIX: filtro de panico - VIX > threshold -> ABORTA todos os sinais
 - DXY neutro (|ROC| < threshold) -> sempre passa
 ROADMAP: FASE 3 (S41.4)
 """
@@ -63,7 +63,7 @@ def check_dxy_alignment(
     direction_bear = direction == "BEARISH"
 
     if direction not in ("BULLISH", "BEARISH"):
-        logger.info("DXY: direcao desconhecida '%s' para %s — passando", signal_direction, symbol)
+        logger.info("DXY: direcao desconhecida '%s' para %s - passando", signal_direction, symbol)
         return True
 
     if symbol in _INVERSE_SYMBOLS:
@@ -84,7 +84,7 @@ def check_dxy_alignment(
         return True
 
     # Simbolo desconhecido: passa sem filtro
-    logger.debug("DXY: simbolo '%s' nao mapeado — passando", symbol)
+    logger.debug("DXY: simbolo '%s' nao mapeado - passando", symbol)
     return True
 
 
@@ -96,7 +96,7 @@ def check_vix_filter(
 
     Args:
         vix_value: valor atual do VIXUSD
-        max_vix: threshold maximo (default 35 — acima disto e panico)
+        max_vix: threshold maximo (default 35 - acima disto e panico)
 
     Returns:
         True se VIX OK (abaixo do threshold), False se deve abortar.

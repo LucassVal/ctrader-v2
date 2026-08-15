@@ -3,7 +3,6 @@ SPEC: S43 (orc_grid.md)
 ROADMAP: S43 Grid/Walk-Forward
 
 Executa uma unica janela de walk-forward: treina no train, testa no test.
-NUNCA re-otimiza no test — os params sao fixos.
 """
 from __future__ import annotations
 

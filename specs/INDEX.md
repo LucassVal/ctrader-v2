@@ -191,6 +191,10 @@ ctrader/
 ├── ruff.toml / .gitignore         Linter
 ├── gates.sh / requirements-gates  Gates
 │
+├── boot/                          Boot (pre-flight + deps)
+│   ├── BOOT.md                    Inicializador logico
+│   └── check_deps.py              Pre-flight deps (pip+npm+config)
+│
 ├── f0_collector/                 F0 — Coleta (5 ativos + 2 indices: DXYUSD, VIXUSD)
 │   ├── orc_coleta.py              Coleta MCP → snapshot.json + m1/vbt parquet
 │   ├── backfill_orc_coleta.py     Backfill 2 anos (MCP paginado)
@@ -228,6 +232,25 @@ ctrader/
 │   ├── storage_orc_vbt.py         Persistencia VBT Parquet (S27)
 │   ├── storage_orc_consolidated.py SAT: fallback S31-VBT — indicadores do consolidado G23 (730d)
 │   ├── data_source.py             DataSource: leitura unificada (S26)
+│   ├── date_utils.py              Datas: backtest/scan/monitor (S41 v3.2)
+│   ├── orc_bloco1.py              S41: Torneio do Passado (ORQ)
+│   ├── preflight_orc_bloco1.py    SAT: preflight DXY+VIX (S41)
+│   ├── signal_detector_orc_bloco1.py SAT: detect buy/sell (S41)
+│   ├── mae_mfe_orc_bloco1.py      SAT: calc_mae_mfe (S41)
+│   ├── signal_matrix_orc_bloco1.py SAT: build_boolean_matrix (S41)
+│   ├── dxy_filter_orc_bloco1.py   SAT: filtro DXY+VIX (S41.4)
+│   ├── time_exit_orc_bloco1.py    SAT: generate_exits (S41)
+│   ├── grid_search_orc_bloco1.py  SAT: run_parameter_grid (S41)
+│   ├── orc_bloco2.py              S42: Sobrevivencia (ORQ)
+│   ├── breakeven_orc_bloco2.py    SAT: build_be_callback (S42)
+│   ├── layer_comparator_orc_bloco2.py SAT: compare_layers (S42)
+│   ├── montecarlo_orc_bloco2.py   SAT: monte_carlo_shuffle (S42)
+│   ├── oco_atr_orc_bloco2.py      SAT: calc_sl_tp_pcts (S42)
+│   ├── partial_exit_orc_bloco2.py SAT: build_tp_callback (S42)
+│   ├── orc_grid.py                S43: walk-forward grid (ORQ)
+│   ├── parameter_grid_orc_grid.py SAT: build_parameter_grid (S43)
+│   ├── stability_analyzer_orc_grid.py SAT: analyze_stability (S43)
+│   ├── window_runner_orc_grid.py  SAT: run_single_window (S43)
 │   └── json_log / logger / ...    Satelites
 │
 ├── contracts/                     CONTRATOS cross-phase

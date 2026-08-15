@@ -89,11 +89,11 @@ def main():
             all_ok = False
 
     if results["critical"].get("talib", {}).get("ok"):
-        import talib  # noqa: PLC0415 — lazy import intencional (lib opcional)
+        import talib
         results["talib"] = {"version": talib.__version__, "patterns": 61}
 
     if results["critical"].get("vectorbt", {}).get("ok"):
-        import vectorbt as vbt  # noqa: PLC0415 — lazy import intencional (lib opcional)
+        import vectorbt as vbt
         results["vectorbt"] = {"version": vbt.__version__}
 
     results["all_ok"] = all_ok

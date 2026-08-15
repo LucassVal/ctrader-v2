@@ -1,19 +1,6 @@
 """PROPOSITO: storage_orc_vbt.py — Persistencia Vector BT no Parquet.
 SPEC: S27 / S39 (MTF — save_indicators timeframe suffix)
-ROADMAP: S27, C4 — 1 arquivo vbt_{SYM}[_{TF}].parquet por simbolo/timeframe
-
-R-USE: storage_orc_coleta.py (append_rows no Parquet). S2.5: m1 bruto F0.
-Ampliado: save_indicators() + load_indicators() + load_history().
-S31-VBT (2026-07-30): fallback para o CONSOLIDADO G23 (2 anos) via SAT
-utils/storage_orc_consolidated.py — o vbt so acumula snapshots do F0 vivo
-(~1 dia); quem cobre mais historico vence.
-
-Arquitetura:
-    data/m1_{SYM}_{ANO}.parquet        -> OHLCV bruto (F0)
-    data/vbt_{SYM}.parquet             -> indicadores M1 + timestamps
-    data/vbt_{SYM}_M5.parquet          -> indicadores M5 (resample local)
-    data/vbt_{SYM}_M15.parquet         -> indicadores M15 (resample local)
-    data/consolidated/{SYM}_M1.parquet -> OHLCV canonico 2 anos (G23) -> fallback
+ROADMAP: S27, C4 — vbt_{SYM}[_{TF}].parquet por simbolo/timeframe. Fallback consolidado G23 via storage_orc_consolidated.
 """
 
 from __future__ import annotations
@@ -27,7 +14,6 @@ import pandas as pd
 from utils.storage_orc_consolidated import consolidated_indicator_points
 
 DATA_DIR = Path(__file__).resolve().parent.parent / "data"
-
 
 def _vbt_path(symbol: str, timeframe: str | None = None) -> Path:
     """Caminho do Parquet de indicadores VBT para 1 simbolo (opcional timeframe)."""

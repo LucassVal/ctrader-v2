@@ -131,11 +131,12 @@ Métrica de aprovação:
 Só após XAUUSD aprovado → expandir para os outros 4 pares.
 ```
 
-## ORQUESTRADOR — `utils/orc_bloco2.py` (312L, implementado)
+## ORQUESTRADOR — `utils/orc_bloco2.py` (313L, implementado)
 
 Wireado em `routers/ctrader_v2.py:/lab/bloco2`. Validado via script direto:
 - 709 trades EURUSD 90d, best_layer=oco_atr, 33.8s.
 - Servidor atual nao carrega codigo novo (zombie PID).
+- **Monte Carlo wireado (v2.1)**: `run_bloco2()` roda `monte_carlo_shuffle()` na melhor camada e expoe `monte_carlo` no contrato de saida (S42 §Pre-requisito: Sharpe nao eh sorte).
 
 ```python
 def run_bloco2(

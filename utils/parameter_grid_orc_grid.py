@@ -1,4 +1,4 @@
-"""PROPOSITO: parameter_grid_orc_bloco1.py — SAT S43.1: build_parameter_grid().
+"""PROPOSITO: parameter_grid_orc_grid.py — SAT S43.1: build_parameter_grid().
 SPEC: S43 (orc_grid.md)
 ROADMAP: S43 Grid/Walk-Forward
 
