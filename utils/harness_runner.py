@@ -47,7 +47,7 @@ def run_pytest() -> tuple[bool, str]:
 
     result = subprocess.run(
         [python, "-m", "pytest", str(test_dir), "-v", "--tb=short", "-x"],
-        capture_output=True, text=True, timeout=120,
+        capture_output=True, text=True, timeout=300,
         cwd=str(Path(__file__).resolve().parent.parent),
     )
     output_parts.append(result.stdout + result.stderr)

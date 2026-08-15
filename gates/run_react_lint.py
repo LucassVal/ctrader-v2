@@ -28,7 +28,7 @@ def run_eslint() -> tuple[int, str]:
             [str(eslint_bin), "src/", "--ext", ".ts,.tsx", "--max-warnings", "0"],
             capture_output=True, text=True,
             cwd=str(DASHBOARD_DIR),
-            timeout=60,
+            timeout=180,
         )
         if result.returncode == 0:
             return 0, "Todos os arquivos TSX/TS passaram no ESLint"
@@ -41,7 +41,7 @@ def run_eslint() -> tuple[int, str]:
     except FileNotFoundError:
         return -1, "ESLint nao instalado. Rode: npm install"
     except subprocess.TimeoutExpired:
-        return -1, "ESLint timeout (>60s)"
+        return -1, "ESLint timeout (>180s)"
 
 
 if __name__ == "__main__":

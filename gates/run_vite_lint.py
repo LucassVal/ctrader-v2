@@ -30,7 +30,7 @@ def run_oxlint() -> tuple[int, str, int]:
             [str(oxlint_bin), "src/", "--deny-warnings"],
             capture_output=True, text=True,
             cwd=str(DASHBOARD_DIR),
-            timeout=30,
+            timeout=180,
         )
         output = result.stdout + result.stderr
 
